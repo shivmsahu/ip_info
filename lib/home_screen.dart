@@ -37,6 +37,8 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     var res = await ApiHandler.apiCall(ipAddress: ipAddress);
     if (res.isSuccess) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(ipAddress.isEmpty ? "Showing your IP info" : "Showing IP info of $ipAddress")));
       if (mounted) {
         setState(() {
           _model = res.data;
@@ -55,71 +57,80 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: const Color(0xffBBE1C3),
-        appBar: AppBar(
-          title: const Text("IP Info"),
-        ),
+        backgroundColor: const Color(0xffBBE1C3),
+        // appBar: AppBar(
+        //   title: const Text("IP Info"),
+        // ),
         body: SafeArea(
           child: Stack(
             children: [
-              Container(
-                padding: const EdgeInsets.all(16.0),
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      if (_model != null) DisplayIpData(model: _model!),
-                      Row(
-                        children: [
-                          const Spacer(),
-                          ElevatedButton(
-                              onPressed: getData,
-                              child: Text(_model == null
-                                  ? "Get your IP info"
-                                  : "Reload")),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 16,
-                      ),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: TextFormField(
-                              keyboardType: TextInputType.number,
-                              decoration: const InputDecoration(
-                                label: Text("Enter IP Address"),
-                                hintText: "Eg: 0.0.0.0",
-                                border: OutlineInputBorder(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(5.0)),
-                                    borderSide: BorderSide(width: 1)),
-                              ),
-                              controller: _controller,
-                              onFieldSubmitted: (value) {
-                                getData(ipAddress: value);
-                              },
-                            ),
+              Center(
+                child: Container(
+                  width: width * (width > 550 ? 0.6 : 0.8),
+                  padding: const EdgeInsets.all(16.0),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        const Text(
+                          "IP Info",
+                          style: TextStyle(
+                              fontSize: 25,
+                              color: Colors.blueGrey,
+                            fontWeight: FontWeight.bold
                           ),
-                          IconButton(
-                            color: Theme.of(context).primaryColor,
-                            onPressed: () {
-                              getData(ipAddress: _controller.text);
-                            },
-                            icon: const Icon(Icons.navigate_next_rounded),
-                          )
-                        ],
-                      )
-                    ],
+                        ),
+                        if (_model != null) DisplayIpData(model: _model!),
+                        Center(
+                          child: ElevatedButton(
+                              onPressed: getData,
+                              child: const Text("Get your IP info")),
+                        ),
+                        const SizedBox(
+                          height: 16,
+                        ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextFormField(
+                                keyboardType: TextInputType.number,
+                                decoration: const InputDecoration(
+                                  label: Text("Enter IP Address"),
+                                  hintText: "Eg: 0.0.0.0",
+                                  border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(5.0)),
+                                      borderSide: BorderSide(width: 1)),
+                                ),
+                                controller: _controller,
+                                onFieldSubmitted: (value) {
+                                  getData(ipAddress: value);
+                                },
+                              ),
+                            ),
+                            IconButton(
+                              color: Theme.of(context).primaryColor,
+                              onPressed: () {
+                                getData(ipAddress: _controller.text);
+                              },
+                              icon: const Icon(Icons.navigate_next_rounded),
+                            )
+                          ],
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ),
               if (showLoader)
                 Container(
+                  height: MediaQuery.of(context).size.height,
                     color: Colors.grey.withOpacity(0.5),
                     child: Center(
                         child: LoadingAnimationWidget.fourRotatingDots(
-                            color: Theme.of(context).primaryColor, size: 50)))
+                            color: Theme.of(context).primaryColor,
+                            size: 50)))
             ],
           ),
         ));
